@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const prettyDate = require('../utils/prettyDate');
 const reactionSchema = require('./Reaction')
 
 const ThoughtsSchema = Schema(
@@ -13,7 +14,7 @@ const ThoughtsSchema = Schema(
             type: Date,
             default: Date.now,
             //dont forget to add this in the utis folder JOEY!!!!!!
-            get: (createdAtVal) => dateFormat(createdAtVal)
+            get: (createdAtVal) => prettyDate(createdAtVal)
         },
         username: {
             type: String,

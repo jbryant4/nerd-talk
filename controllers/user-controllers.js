@@ -1,7 +1,7 @@
 
 //Bonus: if user is deleted delete their thoughts 
 
-const { User } = require('../models')
+const { User, Thoughts } = require('../models')
 
 const userController = {
     // get all users
@@ -72,7 +72,10 @@ const userController = {
                     res.status(404).json({ message: 'No User found with this id!' });
                     return;
                 }
-                res.json(userData);
+                // this is really not effective because the username is not directly tied to thoughts  
+                Thoughts.remove({username: userData.username})
+                .then(thoughtData => res.json(thoughtData))
+                .catch(err => res.status(400).json(err));
             })
             .catch(err => res.status(400).json(err));
     },
