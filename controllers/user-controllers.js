@@ -1,6 +1,4 @@
 
-//POST: add a new user and add a new friend
-//Delete: delete friend
 //Bonus: if user is deleted delete their thoughts 
 
 const { User } = require('../models')
@@ -77,6 +75,49 @@ const userController = {
                 res.json(userData);
             })
             .catch(err => res.status(400).json(err));
+    },
+
+    //! for the friends part 'api/nerds/:userId/friends/:friendId
+    //add a friend 
+    addFriend({ params }, res) {
+        //update the user friends list 
+        User.findOneAndUpdate(
+            { _id: params.userId },
+            { $addToSet: { friends: params.friendId } },
+            { new: true }
+        )
+            .then(userData => {
+                if (!userData) {
+                    res.status(404).json({ message: 'No friend with this id!' });
+                    return;
+                }
+
+                res.json(userData);
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(400).json(err)
+            });
+    },
+
+    //remove friend
+    removeFriend({ params }, res) {
+        User.findOneAndUpdate(
+            { _id: params.userId },
+            { $pull: { friends: params.friendId } },
+            { new: true }
+        )
+            .then(userData => {
+                if (!userData) {
+                    res.status(404).json({ message: 'No friend with this id!' });
+                    return;
+                }
+                res.json(userData);
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(400).json(err)
+            });
     }
 };
 
