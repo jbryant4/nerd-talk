@@ -1,7 +1,6 @@
-// GET : all and by _id
+
 //POST: add a new user and add a new friend
-//PUT: update user by _id
-//Delete: user by _id and delete friend
+//Delete: delete friend
 //Bonus: if user is deleted delete their thoughts 
 
 const { User } = require('../models')
@@ -19,6 +18,26 @@ const userController = {
             });
     },
 
+    //get a user by _id
+    getUserById({ params }, res) {
+        User.findOne({ _id: params.id })
+            .populate({
+                path: 'thoughts',
+                select: '-__v'
+            })
+            .populate({
+                path: 'friends',
+                select: '-__v'
+            })
+            .then(userData => res.json(userData))
+            .catch(err => {
+                console.log(err);
+                res.status(400).json(err)
+            });
+    },
+
+
+    //create a new user
     createUser({ body }, res) {
         User.create(body)
             .then(userData => res.json(userData))
@@ -26,6 +45,38 @@ const userController = {
                 console.log(err);
                 res.status(400).json(err)
             });
+    },
+
+    //update user by _id
+    updateUser({ params, body }, res) {
+        User.findOneAndUpdate(
+            { _id: params.id },
+            body,
+            { new: true, runValidators: true }
+        )
+            .then(userData => {
+                if (!userData) {
+                    res.status(404).json({ message: 'No User found with this id!' });
+                    return;
+                }
+                res.json(userData);
+            })
+            .catch(err => res.status(400).json(err));
+    },
+
+    //delete user by _id
+    deleteUser({ params }, res) {
+        User.findOneAndDelete(
+            { _id: params.id }
+        )
+            .then(userData => {
+                if (!userData) {
+                    res.status(404).json({ message: 'No User found with this id!' });
+                    return;
+                }
+                res.json(userData);
+            })
+            .catch(err => res.status(400).json(err));
     }
 };
 
